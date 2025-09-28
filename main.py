@@ -13,7 +13,7 @@
 # def read_root(name: str):
 #     return{"message": name}
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from uuid import UUID
 
@@ -50,13 +50,27 @@ def create_book(book: main):
 def update_book(
     book_id: UUID, book: main
 ):  #  we want to update a book by its id, so we need to pass the id as a path parameter
-    for index, b in enumerate(
-        BOOKS
-    ):  #  we need to loop through the list of books to find the book with the given id. #  use enumerate to get the index of the book in the list #  then we can update the book at that index #  then return the updated book #  if the book is not found, return an error message
-        if b.id == book_id:
-            BOOKS[index] = book
-            return BOOKS[index]
-    return {"error": "Book not found"}
+    counter = 0
+
+    for x in BOOKS:
+        counter += 1
+        if x.id == book_id:
+            BOOKS[counter - 1] = book
+            return BOOKS[counter - 1]
+
+    raise HTTPException(status_code=404, detail=f"book with id {book_id} not found")
+
+
+@app.delete("/{book_id")
+def delete_book(book_id: UUID):
+    counter = 0
+    for x in BOOKS:
+        counter += 1
+        if x.id == book_id:
+            del BOOKS[counter - 1]
+            return f"ID: {book_id} deleted"
+    raise HTTPException(status_code=404, detail=f" book with id{book_id} not found")
+
     #  we want to create a book, so we need to define a path operation function that will handle the post request
     #  while condition: we want to create a book, we also
 
